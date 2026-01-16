@@ -8,6 +8,7 @@ import CameraCapture from "@/components/CameraCapture";
 import ProductCard from "@/components/ProductCard";
 
 type AppState = "idle" | "camera" | "analyzing" | "results";
+type AppMode = "shop" | "skin";
 
 export interface ProductResult {
   productName: string;
@@ -16,6 +17,12 @@ export interface ProductResult {
   priceEstimate: string;
   reason: string;
   confidence: number;
+  skinAnalysis?: {
+    skinType: string;
+    concerns: string[];
+    undertone: string;
+    advice: string;
+  };
   similarProducts?: {
     name: string;
     price: string;
@@ -29,6 +36,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default function Home() {
   const [state, setState] = useState<AppState>("idle");
+  const [mode, setMode] = useState<AppMode>("shop");
   const [image, setImage] = useState<string | null>(null);
   const [result, setResult] = useState<ProductResult | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
@@ -146,22 +154,49 @@ export default function Home() {
       const genAI = new GoogleGenerativeAI(storedKey);
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-      const prompt = `Analyze this image and identify the main product.
-      Also recommend 3 similar or alternative specific products that a user might be interested in.
+      let prompt = "";
+      if (mode === "shop") {
+        prompt = `Analyze this image and identify the main product.
+        Also recommend 3 similar or alternative specific products that a user might be interested in.
 
-      Return ONLY a JSON object with these fields:
-      - productName: Short, precise search term for the main item
-      - searchQuery: The best Amazon search query for the main item
-      - category: Broad category (e.g. "Electronics")
-      - priceEstimate: Rough estimate in ${currency} (e.g. "${currency}50-100")
-      - reason: 1 short sentence on why this is the likely match.
-      - confidence: 0.0 to 1.0 confidence score
-      - similarProducts: Array of 3 objects, each containing:
-          - name: Specific brand/model name of the similar product
-          - price: Estimated price string (e.g. "${currency}45")
-          - type: Short label (e.g. "Cheaper Option", "Premium Upgrade", "Best Seller")
-          - reason: 1 short sentence on why you recommend this.
-          - asin: A likely ASIN (Amazon Standard Identification Number) for this specific product (e.g. "B08N5LLDSG"). Try your best to guess a valid one for the region.`;
+        Return ONLY a JSON object with these fields:
+        - productName: Short, precise search term for the main item
+        - searchQuery: The best Amazon search query for the main item
+        - category: Broad category (e.g. "Electronics")
+        - priceEstimate: Rough estimate in ${currency} (e.g. "${currency}50-100")
+        - reason: 1 short sentence on why this is the likely match.
+        - confidence: 0.0 to 1.0 confidence score
+        - similarProducts: Array of 3 objects, each containing:
+            - name: Specific brand/model name of the similar product
+            - price: Estimated price string (e.g. "${currency}45")
+            - type: Short label (e.g. "Cheaper Option", "Premium Upgrade", "Best Seller")
+            - reason: 1 short sentence on why you recommend this.
+            - asin: A likely ASIN (Amazon Standard Identification Number) for this specific product (e.g. "B08N5LLDSG"). Try your best to guess a valid one for the region.`;
+      } else {
+        prompt = `Analyze this selfie for skin condition and makeup tone. 
+        Focus on identifying skin type, concerns, and undertone. Recommend 3 relevant skincare or makeup products available on Amazon.
+        Be helpful and constructive. DO NOT give medical advice, just general cosmetic observations.
+
+        Return ONLY a JSON object with these fields:
+        - productName: "Skin Analysis"
+        - searchQuery: "skincare routine"
+        - category: "Personal Care"
+        - priceEstimate: "Varies"
+        - reason: "Analysis based on your selfie"
+        - confidence: 0.9
+        - skinAnalysis: {
+            skinType: "e.g. Oily, Dry, Combination, Sensitive",
+            concerns: ["list", "of", "top", "concerns"],
+            undertone: "e.g. Warm, Cool, Neutral",
+            advice: "Overall summary of advice"
+        }
+        - similarProducts: Array of 3 objects (skincare/makeup recommendations), each containing:
+            - name: Specific brand/model name
+            - price: Estimated price string in ${currency}
+            - type: Label like "Cleanser", "Moisturizer", "Foundation Match"
+            - reason: Why this fits the skin analysis
+            - asin: A likely ASIN for the region.`;
+      }
 
       // Helper to strip data:image prefix
       const match = optimizedImage.match(/^data:(image\/[a-z]+);base64,(.+)$/);
@@ -237,20 +272,39 @@ export default function Home() {
           >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-900/20 via-black to-black -z-10" />
 
+            {/* Tab Switcher */}
+            <div className="flex glass p-1 rounded-full border border-white/20">
+              <button
+                onClick={() => setMode("shop")}
+                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${mode === "shop" ? "bg-amber-500 text-black shadow-lg" : "text-gray-400 hover:text-white"}`}
+              >
+                🛍️ Shop
+              </button>
+              <button
+                onClick={() => setMode("skin")}
+                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${mode === "skin" ? "bg-pink-500 text-black shadow-lg" : "text-gray-400 hover:text-white"}`}
+              >
+                ✨ Skin Analysis
+              </button>
+            </div>
+
             <motion.div
               animate={{
                 scale: [1, 1.05, 1],
                 boxShadow: [
-                  "0 0 20px rgba(255,153,0,0.2)",
-                  "0 0 40px rgba(255,153,0,0.4)",
-                  "0 0 20px rgba(255,153,0,0.2)",
+                  mode === "shop" ? "0 0 20px rgba(255,153,0,0.2)" : "0 0 20px rgba(236,72,153,0.2)",
+                  mode === "shop" ? "0 0 40px rgba(255,153,0,0.4)" : "0 0 40px rgba(236,72,153,0.4)",
+                  mode === "shop" ? "0 0 20px rgba(255,153,0,0.2)" : "0 0 20px rgba(236,72,153,0.2)",
                 ],
               }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="w-48 h-48 rounded-full bg-gradient-to-br from-orange-500/20 to-amber-500/10 border border-amber-500/30 flex items-center justify-center cursor-pointer"
+              className={`w-48 h-48 rounded-full border flex items-center justify-center cursor-pointer transition-colors ${mode === "shop"
+                  ? "bg-gradient-to-br from-orange-500/20 to-amber-500/10 border-amber-500/30"
+                  : "bg-gradient-to-br from-pink-500/20 to-rose-500/10 border-pink-500/30"
+                }`}
               onClick={() => setState("camera")}
             >
-              <Scan size={64} className="text-amber-500" />
+              <Scan size={64} className={mode === "shop" ? "text-amber-500" : "text-pink-500"} />
             </motion.div>
 
             <label className="flex items-center gap-2 glass px-6 py-3 rounded-full text-white cursor-pointer hover:bg-white/20 transition-all">
@@ -270,15 +324,18 @@ export default function Home() {
                   }
                 }}
               />
-              <span className="text-sm font-medium">📁 Upload from Gallery</span>
+              <span className="text-sm font-medium">📁 {mode === "shop" ? "Upload Image" : "Upload Selfie"}</span>
             </label>
 
             <div>
-              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-white">
-                Snap & Shop
+              <h1 className={`text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r transition-all ${mode === "shop" ? "from-orange-400 to-white" : "from-pink-400 to-rose-200"
+                }`}>
+                {mode === "shop" ? "Snap & Shop" : "Smart Skin Scan"}
               </h1>
               <p className="text-gray-400 mt-2">
-                Find any product on Amazon instantly.
+                {mode === "shop"
+                  ? "Find any product on Amazon instantly."
+                  : "AI-powered skin analysis & recommendations."}
               </p>
             </div>
 

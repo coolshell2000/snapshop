@@ -11,6 +11,12 @@ interface ProductCardProps {
         priceEstimate: string;
         confidence: number;
         reason?: string;
+        skinAnalysis?: {
+            skinType: string;
+            concerns: string[];
+            undertone: string;
+            advice: string;
+        };
         similarProducts?: {
             name: string;
             price: string;
@@ -23,6 +29,8 @@ interface ProductCardProps {
     userTag?: string;
     region?: string;
 }
+
+import { Sparkles, BrainCircuit, Droplets } from "lucide-react";
 
 const REGION_DOMAINS: Record<string, string> = {
     "US": "amazon.com",
@@ -77,6 +85,47 @@ export default function ProductCard({ result, imageSrc, userTag = "bt200008-21",
                         </p>
                     )}
 
+                    {result.skinAnalysis && (
+                        <div className="space-y-4 animate-in fade-in duration-500">
+                            <div className="flex items-center gap-2 text-amber-500">
+                                <BrainCircuit size={18} />
+                                <span className="font-bold text-sm uppercase tracking-wider">AI Insights</span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                                    <div className="text-[10px] text-gray-500 uppercase font-bold mb-1">Skin Type</div>
+                                    <div className="text-sm text-white font-medium">{result.skinAnalysis.skinType}</div>
+                                </div>
+                                <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                                    <div className="text-[10px] text-gray-500 uppercase font-bold mb-1">Undertone</div>
+                                    <div className="text-sm text-white font-medium">{result.skinAnalysis.undertone}</div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                                <div className="text-[10px] text-gray-500 uppercase font-bold mb-2">Concerns</div>
+                                <div className="flex flex-wrap gap-2">
+                                    {result.skinAnalysis.concerns.map((concern, i) => (
+                                        <span key={i} className="text-[10px] bg-amber-500/10 text-amber-500 px-2 py-1 rounded-full border border-amber-500/20">
+                                            {concern}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="bg-amber-500/10 p-4 rounded-xl border border-amber-500/20">
+                                <div className="flex items-center gap-2 text-amber-500 mb-2">
+                                    <Droplets size={16} />
+                                    <span className="text-xs font-bold uppercase">Expert Advice</span>
+                                </div>
+                                <p className="text-xs text-gray-300 leading-relaxed">
+                                    {result.skinAnalysis.advice}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     <a
                         href={amazonUrl}
                         target="_blank"
@@ -84,7 +133,7 @@ export default function ProductCard({ result, imageSrc, userTag = "bt200008-21",
                         className="w-full bg-[#FF9900] text-black font-bold py-4 rounded-xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group"
                     >
                         <ShoppingCart size={20} className="group-hover:rotate-12 transition-transform" />
-                        Shop on Amazon {region !== "US" ? `(${region})` : ""}
+                        {result.skinAnalysis ? "Browse Skin Solutions" : `Shop on Amazon ${region !== "US" ? `(${region})` : ""}`}
                     </a>
                 </div>
             </motion.div>
