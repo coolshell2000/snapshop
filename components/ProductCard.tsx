@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ShoppingCart, ExternalLink } from "lucide-react";
+import { Browser } from '@capacitor/browser';
 
 interface ProductCardProps {
     result: {
@@ -41,6 +42,16 @@ const REGION_DOMAINS: Record<string, string> = {
     "CA": "amazon.ca",
     "AU": "amazon.com.au",
     "IN": "amazon.in",
+};
+
+const openExternalLink = async (url: string) => {
+    try {
+        // Try to open in external browser (Capacitor)
+        await Browser.open({ url });
+    } catch (error) {
+        // Fallback for web (non-Capacitor environment)
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
 };
 
 export default function ProductCard({ result, imageSrc, userTag = "bt200008-21", region = "US" }: ProductCardProps) {
@@ -126,15 +137,13 @@ export default function ProductCard({ result, imageSrc, userTag = "bt200008-21",
                         </div>
                     )}
 
-                    <a
-                        href={amazonUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <button
+                        onClick={() => openExternalLink(amazonUrl)}
                         className="w-full bg-[#FF9900] text-black font-bold py-4 rounded-xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group"
                     >
                         <ShoppingCart size={20} className="group-hover:rotate-12 transition-transform" />
                         {result.skinAnalysis ? "Browse Skin Solutions" : `Shop on Amazon ${region !== "US" ? `(${region})` : ""}`}
-                    </a>
+                    </button>
                 </div>
             </motion.div>
 
@@ -150,49 +159,50 @@ export default function ProductCard({ result, imageSrc, userTag = "bt200008-21",
                         <span className="text-sm font-bold text-gray-300">You might also like</span>
                     </div>
                     <div className="space-y-4">
-                        {result.similarProducts.map((item, idx) => (
-                            <a
-                                key={idx}
-                                href={`https://www.${domain}/s?k=${encodeURIComponent(item.name)}&tag=${userTag}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="block p-3 glass rounded-xl hover:bg-white/10 transition-colors border border-white/5 active:scale-[0.98]"
-                            >
-                                <div className="flex items-start gap-4">
-                                    <div className="w-20 h-20 rounded-lg bg-black/40 overflow-hidden border border-white/10 shrink-0 relative">
-                                        {/* Try Amazon Image first via ASIN, Fallback to AI Generation */}
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img
-                                            src={item.asin ? `https://images-na.ssl-images-amazon.com/images/P/${item.asin}.01._SS200_.jpg` : `https://image.pollinations.ai/prompt/${encodeURIComponent(item.name)}?width=160&height=160&nologo=true&seed=${idx}`}
-                                            onError={(e) => {
-                                                // Fallback to AI image if Amazon image fails (404)
-                                                const target = e.target as HTMLImageElement;
-                                                target.onerror = null; // Prevent loop
-                                                target.src = `https://image.pollinations.ai/prompt/${encodeURIComponent(item.name)}?width=160&height=160&nologo=true&seed=${idx}`;
-                                            }}
-                                            alt={item.name}
-                                            className="w-full h-full object-cover"
-                                            loading="lazy"
-                                        />
-                                    </div>
-                                    <div className="flex-1 min-w-0 py-1">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[10px] font-mono text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded uppercase tracking-wider">{item.type}</span>
+                        {result.similarProducts.map((item, idx) => {
+                            const productUrl = `https://www.${domain}/s?k=${encodeURIComponent(item.name)}&tag=${userTag}`;
+                            return (
+                                <div
+                                    key={idx}
+                                    onClick={() => openExternalLink(productUrl)}
+                                    className="block p-3 glass rounded-xl hover:bg-white/10 transition-colors border border-white/5 active:scale-[0.98] cursor-pointer"
+                                >
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-20 h-20 rounded-lg bg-black/40 overflow-hidden border border-white/10 shrink-0 relative">
+                                            {/* Try Amazon Image first via ASIN, Fallback to AI Generation */}
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={item.asin ? `https://images-na.ssl-images-amazon.com/images/P/${item.asin}.01._SS200_.jpg` : `https://image.pollinations.ai/prompt/${encodeURIComponent(item.name)}?width=160&height=160&nologo=true&seed=${idx}`}
+                                                onError={(e) => {
+                                                    // Fallback to AI image if Amazon image fails (404)
+                                                    const target = e.target as HTMLImageElement;
+                                                    target.onerror = null; // Prevent loop
+                                                    target.src = `https://image.pollinations.ai/prompt/${encodeURIComponent(item.name)}?width=160&height=160&nologo=true&seed=${idx}`;
+                                                }}
+                                                alt={item.name}
+                                                className="w-full h-full object-cover"
+                                                loading="lazy"
+                                            />
                                         </div>
-                                        <h3 className="text-sm font-bold text-white leading-snug line-clamp-2 mb-1">{item.name}</h3>
-                                        <p className="text-sm text-gray-400">Est. {item.price}</p>
+                                        <div className="flex-1 min-w-0 py-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="text-[10px] font-mono text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded uppercase tracking-wider">{item.type}</span>
+                                            </div>
+                                            <h3 className="text-sm font-bold text-white leading-snug line-clamp-2 mb-1">{item.name}</h3>
+                                            <p className="text-sm text-gray-400">Est. {item.price}</p>
+                                        </div>
+                                        <div className="p-2 bg-white/5 rounded-full text-gray-400 self-center">
+                                            <ShoppingCart size={16} />
+                                        </div>
                                     </div>
-                                    <div className="p-2 bg-white/5 rounded-full text-gray-400 self-center">
-                                        <ShoppingCart size={16} />
-                                    </div>
+                                    {item.reason && (
+                                        <p className="mt-3 text-xs text-gray-400 italic pl-1 border-l-2 border-white/10 ml-2">
+                                            &quot;{item.reason}&quot;
+                                        </p>
+                                    )}
                                 </div>
-                                {item.reason && (
-                                    <p className="mt-3 text-xs text-gray-400 italic pl-1 border-l-2 border-white/10 ml-2">
-                                        &quot;{item.reason}&quot;
-                                    </p>
-                                )}
-                            </a>
-                        ))}
+                            );
+                        })}
                     </div>
                 </motion.div>
             )}
