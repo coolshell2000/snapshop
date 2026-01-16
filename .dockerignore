@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+android
+ios
+.git
+.gitignore
+.dockerignore
+*.md
+Dockerfile
+capacitor.config.ts
+package-lock.json
