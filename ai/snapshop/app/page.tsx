@@ -378,8 +378,8 @@ export default function Home() {
             <div className="absolute bottom-4 right-4 z-50 flex flex-col items-end gap-2">
               <div className="flex gap-2">
                 <a
-                  href="/SnapShop.apk"
-                  download="SnapShop.apk"
+                  href="/SnapBeautyShot.apk"
+                  download="SnapBeautyShot.apk"
                   className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-bold py-2 px-3 rounded-full shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all flex items-center gap-1"
                   onClick={(e) => {
                     e.stopPropagation();

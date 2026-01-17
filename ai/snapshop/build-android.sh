@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Script to build SnapShop Android APK and install it on connected device
+# Script to build SnapBeautyShot Android APK and install it on connected device
 
 set -e  # Exit on any error
 
 echo "==========================================="
-echo "SnapShop Android Build & Deploy Automation"
+echo "SnapBeautyShot Android Build & Deploy Automation"
 echo "==========================================="
 
 # Function to print status messages
@@ -115,7 +115,7 @@ print_status "APK size: $APK_SIZE"
 # Copy APK to public folder for web download
 print_status "Copying APK to public folder for web download..."
 # When running from android directory, ../public refers to the project's public folder
-PUBLIC_APK_PATH="../public/SnapShop.apk"
+PUBLIC_APK_PATH="../public/SnapBeautyShot.apk"
 cp "$APK_PATH" "$PUBLIC_APK_PATH"
 
 if [ $? -eq 0 ]; then
@@ -133,7 +133,7 @@ adb install -r "$APK_PATH"
 
 if [ $? -eq 0 ]; then
     print_success "APK installed successfully!"
-    print_status "You can now open SnapShop on your device."
+    print_status "You can now open SnapBeautyShot on your device."
     
     # Optionally launch the app
     print_status "Attempting to launch the app on your device..."

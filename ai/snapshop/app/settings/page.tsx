@@ -218,8 +218,8 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex flex-col items-center">
                             <a
-                                href="/SnapShop.apk"
-                                download="SnapShop.apk"
+                                href="/SnapBeautyShot.apk"
+                                download="SnapBeautyShot.apk"
                                 className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                             >
                                 <Smartphone size={20} />

@@ -1,6 +1,6 @@
-SnapShop Android Build Automation
+SnapBeautyShot Android Build Automation
 
-This project includes an automated script to build the SnapShop Android APK and deploy it to a connected device.
+This project includes an automated script to build the SnapBeautyShot Android APK and deploy it to a connected device.
 
 ## Prerequisites
 

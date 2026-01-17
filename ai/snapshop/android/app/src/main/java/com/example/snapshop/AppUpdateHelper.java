@@ -28,20 +28,20 @@ import okhttp3.ResponseBody;
 
 public class AppUpdateHelper {
     private static final String TAG = "AppUpdateHelper";
-    
+
     private Context context;
     private OkHttpClient httpClient;
-    
+
     public AppUpdateHelper(Context context) {
         this.context = context;
         this.httpClient = new OkHttpClient();
     }
-    
+
     public void checkForUpdates(String baseUrl) {
         Log.d(TAG, "Checking for updates from: " + baseUrl);
 
         String apkInfoUrl = baseUrl + "apk-info.json";
-        String apkDownloadUrl = baseUrl + "SnapShop.apk";
+        String apkDownloadUrl = baseUrl + "SnapBeautyShot.apk";
 
         // Log the full URLs being used
         Log.d(TAG, "Full APK info URL: " + apkInfoUrl);
@@ -58,7 +58,8 @@ public class AppUpdateHelper {
                 Log.e(TAG, "Failed to check for updates: " + e.getMessage());
                 Log.e(TAG, "Failed URL: " + apkInfoUrl);
 
-                // Check if it's a network issue that might be resolved by using HTTP instead of HTTPS
+                // Check if it's a network issue that might be resolved by using HTTP instead of
+                // HTTPS
                 if (apkInfoUrl.startsWith("https://")) {
                     String httpUrl = apkInfoUrl.replace("https://", "http://");
                     Log.d(TAG, "Attempting fallback to HTTP: " + httpUrl);
@@ -88,7 +89,8 @@ public class AppUpdateHelper {
                     Log.e(TAG, "Response message: " + response.message());
                     Log.e(TAG, "Failed URL: " + apkInfoUrl);
 
-                    // Try alternative path - also try with public/ prefix in case server structure changes
+                    // Try alternative path - also try with public/ prefix in case server structure
+                    // changes
                     String altApkInfoUrl = baseUrl + "public/apk-info.json";
                     Log.d(TAG, "Trying alternative APK info URL with public/ prefix: " + altApkInfoUrl);
 
@@ -103,7 +105,9 @@ public class AppUpdateHelper {
                             Log.e(TAG, "Failed alternative URL: " + altApkInfoUrl);
 
                             // Try the original alternative path as backup
-                            String backupAltApkInfoUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length()-1) + "apk-info.json" : baseUrl + "apk-info.json";
+                            String backupAltApkInfoUrl = baseUrl.endsWith("/")
+                                    ? baseUrl.substring(0, baseUrl.length() - 1) + "apk-info.json"
+                                    : baseUrl + "apk-info.json";
                             Log.d(TAG, "Trying backup alternative APK info URL: " + backupAltApkInfoUrl);
 
                             okhttp3.Request backupRequest = new okhttp3.Request.Builder()
@@ -153,7 +157,7 @@ public class AppUpdateHelper {
                 String serverLastModified = json.getString("lastModified");
 
                 // For now, we'll just trigger an update check
-                String apkDownloadUrl = baseUrl + "SnapShop.apk";
+                String apkDownloadUrl = baseUrl + "SnapBeautyShot.apk";
                 Log.d(TAG, "Initiating download from full APK URL: " + apkDownloadUrl);
                 downloadApk(apkDownloadUrl);
             }
@@ -161,7 +165,7 @@ public class AppUpdateHelper {
             Log.e(TAG, "Error parsing APK info: " + e.getMessage());
         }
     }
-    
+
     private void downloadApk(String downloadUrl) {
         Log.d(TAG, "Starting APK download from full URL: " + downloadUrl);
 
@@ -171,7 +175,7 @@ public class AppUpdateHelper {
         DownloadManager.Request request = new DownloadManager.Request(uri);
 
         // Set title and description
-        request.setTitle("SnapShop Update");
+        request.setTitle("SnapBeautyShot Update");
         request.setDescription("Downloading new version from: " + downloadUrl);
 
         // Set notification visibility
@@ -188,7 +192,7 @@ public class AppUpdateHelper {
         request.setAllowedOverRoaming(true);
 
         // Set file destination
-        request.setDestinationInExternalPublicDir(android.os.Environment.DIRECTORY_DOWNLOADS, "SnapShop.apk");
+        request.setDestinationInExternalPublicDir(android.os.Environment.DIRECTORY_DOWNLOADS, "SnapBeautyShot.apk");
 
         // Enqueue the download
         long downloadId = downloadManager.enqueue(request);
@@ -212,7 +216,8 @@ public class AppUpdateHelper {
 
         context.registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
-        Toast.makeText(context, "Update download started from: " + extractBaseUrl(downloadUrl), Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Update download started from: " + extractBaseUrl(downloadUrl), Toast.LENGTH_SHORT)
+                .show();
     }
 
     private String extractBaseUrl(String fullUrl) {
@@ -224,26 +229,26 @@ public class AppUpdateHelper {
             return "cs2000.linkpc.net"; // Fallback
         }
     }
-    
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void installApk() {
         try {
-            File file = new File(context.getExternalFilesDir(android.os.Environment.DIRECTORY_DOWNLOADS), "SnapShop.apk");
-            
+            File file = new File(context.getExternalFilesDir(android.os.Environment.DIRECTORY_DOWNLOADS),
+                    "SnapBeautyShot.apk");
+
             if (file.exists()) {
                 Uri apkUri = FileProvider.getUriForFile(
-                    context,
-                    context.getPackageName() + ".fileprovider",
-                    file
-                );
-                
+                        context,
+                        context.getPackageName() + ".fileprovider",
+                        file);
+
                 Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                 intent.setData(apkUri);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                
+
                 context.startActivity(intent);
-                
+
                 Log.d(TAG, "APK installation initiated");
             } else {
                 Log.e(TAG, "APK file does not exist at expected location");

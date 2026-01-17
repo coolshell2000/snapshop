@@ -1,6 +1,6 @@
-# ✨ SnapShop: AI-Powered Skin Analysis
+# ✨ SnapBeautyShot: AI-Powered Skin Analysis
 
-SnapShop is a modern, high-performance web and mobile application that leverages **Google's Gemini 2.0 Flash AI** to provide deep skin analysis and personalized skincare recommendations. Simply take a selfie to receive expert-level cosmetic insights.
+SnapBeautyShot is a modern, high-performance web and mobile application that leverages **Google's Gemini 2.0 Flash AI** to provide deep skin analysis and personalized skincare recommendations. Simply take a selfie to receive expert-level cosmetic insights.
 
 ![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
@@ -12,7 +12,7 @@ SnapShop is a modern, high-performance web and mobile application that leverages
 ## 📱 Project Preview
 
 <div align="center">
-  <img src="public/screenshots/snapshop_skin_dedicated.png" width="45%" alt="SnapShop Dedicated Skin Analysis" />
+  <img src="public/screenshots/snapshop_skin_dedicated.png" width="45%" alt="SnapBeautyShot Dedicated Skin Analysis" />
 </div>
 
 ---
@@ -68,7 +68,7 @@ SnapShop is a modern, high-performance web and mobile application that leverages
 
 ## 📱 Mobile Build (Android)
 
-SnapShop is optimized for mobile devices. To build the Android APK:
+SnapBeautyShot is optimized for mobile devices. To build the Android APK:
 
 1.  Ensure you have the Android SDK and Java installed.
 2.  Run the automated build script:
@@ -100,4 +100,4 @@ Contributions are welcome! If you have a feature request or bug report, please o
 
 ---
 
-Built with ❤️ by the SnapShop Team.
+Built with ❤️ by the SnapBeautyShot Team.
