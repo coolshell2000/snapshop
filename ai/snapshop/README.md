@@ -12,7 +12,6 @@ SnapShop is a modern, high-performance web and mobile application that leverages
 ## 📱 Project Preview
 
 <div align="center">
-  <img src="public/screenshots/snapshop_home.png" width="30%" alt="SnapShop Home" />
   <img src="public/screenshots/snapshop_skin.png" width="30%" alt="SnapShop Skin Analysis" />
   <img src="public/screenshots/snapshop_settings.png" width="30%" alt="SnapShop Settings" />
 </div>
