@@ -39,7 +39,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 export default function Home() {
   const { t, secondaryLang, toggleLanguage, currentLang } = useLanguage();
   const [state, setState] = useState<AppState>("idle");
-  const [mode, setMode] = useState<AppMode>("shop");
+  const [mode] = useState<AppMode>("skin");
   const [image, setImage] = useState<string | null>(null);
   const [result, setResult] = useState<ProductResult | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
@@ -255,31 +255,12 @@ export default function Home() {
       const genAI = new GoogleGenerativeAI(storedKey);
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-      let prompt = "";
-      if (mode === "shop") {
-        prompt = `Analyze this image and identify the main product.
-        Also recommend 3 similar or alternative specific products that a user might be interested in.
-
-        Return ONLY a JSON object with these fields:
-        - productName: Short, precise search term for the main item
-        - searchQuery: The best Amazon search query for the main item
-        - category: Broad category (e.g. "Electronics")
-        - priceEstimate: Rough estimate in ${currency} (e.g. "${currency}50-100")
-        - reason: 1 short sentence on why this is the likely match.
-        - confidence: 0.0 to 1.0 confidence score
-        - similarProducts: Array of 3 objects, each containing:
-            - name: Specific brand/model name of the similar product
-            - price: Estimated price string (e.g. "${currency}45")
-            - type: Short label (e.g. "Cheaper Option", "Premium Upgrade", "Best Seller")
-            - reason: 1 short sentence on why you recommend this.
-            - asin: A likely ASIN (Amazon Standard Identification Number) for this specific product (e.g. "B08N5LLDSG"). Try your best to guess a valid one for the region.`;
-      } else {
-        prompt = `Respond in ${currentLang === 'en' ? 'English' :
-                   currentLang === 'hi' ? 'Hindi' :
-                   currentLang === 'zh' ? 'Chinese' :
-                   currentLang === 'fr' ? 'French' :
-                   currentLang === 'es' ? 'Spanish' :
-                   currentLang === 'de' ? 'German' : 'English'}.
+      const prompt = `Respond in ${currentLang === 'en' ? 'English' :
+        currentLang === 'hi' ? 'Hindi' :
+          currentLang === 'zh' ? 'Chinese' :
+            currentLang === 'fr' ? 'French' :
+              currentLang === 'es' ? 'Spanish' :
+                currentLang === 'de' ? 'German' : 'English'}.
 
         Analyze this selfie for skin condition and makeup tone.
         Focus on identifying skin type, concerns, and undertone. Recommend 3 relevant skincare or makeup products available on Amazon.
@@ -304,7 +285,6 @@ export default function Home() {
             - type: Label like "Cleanser", "Moisturizer", "Foundation Match"
             - reason: Why this fits the skin analysis
             - asin: A likely ASIN for the region.`;
-      }
 
       // Helper to strip data:image prefix
       const match = optimizedImage.match(/^data:(image\/[a-z]+);base64,(.+)$/);
@@ -416,21 +396,7 @@ export default function Home() {
               <ApkInfo />
             </div>
 
-            {/* Tab Switcher */}
-            <div className="flex glass p-1 rounded-full border border-white/20">
-              <button
-                onClick={() => setMode("shop")}
-                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${mode === "shop" ? "bg-amber-500 text-black shadow-lg" : "text-gray-400 hover:text-white"}`}
-              >
-                🛍️ {t('tab.shop')}
-              </button>
-              <button
-                onClick={() => setMode("skin")}
-                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${mode === "skin" ? "bg-pink-500 text-black shadow-lg" : "text-gray-400 hover:text-white"}`}
-              >
-                ✨ {t('tab.skin')}
-              </button>
-            </div>
+
 
             <motion.div
               animate={{
@@ -468,18 +434,15 @@ export default function Home() {
                   }
                 }}
               />
-              <span className="text-sm font-medium">📁 {mode === "shop" ? t('main.upload.image') : t('main.upload.selfie')}</span>
+              <span className="text-sm font-medium">📁 {t('main.upload.selfie')}</span>
             </label>
 
             <div>
-              <h1 className={`text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r transition-all ${mode === "shop" ? "from-orange-400 to-white" : "from-pink-400 to-rose-200"
-                }`}>
-                {mode === "shop" ? t('main.title.shop') : t('main.title.skin')}
+              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-rose-200">
+                {t('main.title.skin')}
               </h1>
               <p className="text-gray-400 mt-2">
-                {mode === "shop"
-                  ? t('main.subtitle.shop')
-                  : t('main.subtitle.skin')}
+                {t('main.subtitle.skin')}
               </p>
             </div>
 

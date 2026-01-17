@@ -114,8 +114,8 @@ print_status "APK size: $APK_SIZE"
 
 # Copy APK to public folder for web download
 print_status "Copying APK to public folder for web download..."
-PROJECT_ROOT="../.."
-PUBLIC_APK_PATH="$PROJECT_ROOT/public/SnapShop.apk"
+# When running from android directory, ../public refers to the project's public folder
+PUBLIC_APK_PATH="../public/SnapShop.apk"
 cp "$APK_PATH" "$PUBLIC_APK_PATH"
 
 if [ $? -eq 0 ]; then

@@ -1,6 +1,6 @@
-# 📸 SnapShop: AI-Powered Skin Analysis & Smart Shopping
+# ✨ SnapShop: AI-Powered Skin Analysis
 
-SnapShop is a modern, high-performance web and mobile application that leverages **Google's Gemini 2.0 Flash AI** to provide instant product recognition and deep skin analysis. Whether you're looking for the best price on a product you see or need personalized skincare advice, SnapShop is your AI companion.
+SnapShop is a modern, high-performance web and mobile application that leverages **Google's Gemini 2.0 Flash AI** to provide deep skin analysis and personalized skincare recommendations. Simply take a selfie to receive expert-level cosmetic insights.
 
 ![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
@@ -20,7 +20,6 @@ SnapShop is a modern, high-performance web and mobile application that leverages
 
 ## ✨ Key Features
 
--   **🛍️ Smart Shopping Mode**: Capture any product with your camera to identify it instantly. Get price estimates and direct links to Amazon with your affiliate tag integration.
 -   **✨ AI Skin Analysis**: Take a selfie to receive a comprehensive analysis of your skin type, concerns (e.g., oiliness, sensitivity), and undertones. Get personalized skincare routine recommendations.
 -   **🌍 Multi-Language Support**: Fully localized in English, Hindi, Chinese, French, Spanish, and German. Results are translated on-the-fly using AI.
 -   **📱 Cross-Platform**: Runs perfectly in the browser as a PWA or on Android/iOS via Capacitor.

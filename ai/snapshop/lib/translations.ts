@@ -14,18 +14,11 @@ export const translations: Record<Language, Record<string, string>> = {
         // Header
         'app.title': 'SnapShop',
 
-        // Tabs
-        'tab.shop': 'Shop',
-        'tab.skin': 'Skin Analysis',
-
         // Main Screen
-        'main.title.shop': 'Snap & Shop',
         'main.title.skin': 'Smart Skin Scan',
-        'main.subtitle.shop': 'Find any product on Amazon instantly.',
         'main.subtitle.skin': 'AI-powered skin analysis & recommendations.',
         'main.upload': 'Upload from Gallery',
         'main.upload.selfie': 'Upload Selfie',
-        'main.upload.image': 'Upload Image',
 
         // Analyzing
         'analyzing.title': 'The Eye is Seeing...',
