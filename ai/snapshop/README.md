@@ -1,40 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📸 SnapShop: AI-Powered Skin Analysis & Smart Shopping
 
-## Getting Started
+SnapShop is a modern, high-performance web and mobile application that leverages **Google's Gemini 2.0 Flash AI** to provide instant product recognition and deep skin analysis. Whether you're looking for the best price on a product you see or need personalized skincare advice, SnapShop is your AI companion.
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
+![Capacitor](https://img.shields.io/badge/Capacitor-119EFF?style=for-the-badge&logo=capacitor)
+![Gemini AI](https://img.shields.io/badge/Gemini_2.0_Flash-4285F4?style=for-the-badge&logo=google-gemini)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📱 Project Preview
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+<div align="center">
+  <img src="public/screenshots/snapshop_home.png" width="30%" alt="SnapShop Home" />
+  <img src="public/screenshots/snapshop_skin.png" width="30%" alt="SnapShop Skin Analysis" />
+  <img src="public/screenshots/snapshop_settings.png" width="30%" alt="SnapShop Settings" />
+</div>
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## ✨ Key Features
 
-To learn more about Next.js, take a look at the following resources:
+-   **🛍️ Smart Shopping Mode**: Capture any product with your camera to identify it instantly. Get price estimates and direct links to Amazon with your affiliate tag integration.
+-   **✨ AI Skin Analysis**: Take a selfie to receive a comprehensive analysis of your skin type, concerns (e.g., oiliness, sensitivity), and undertones. Get personalized skincare routine recommendations.
+-   **🌍 Multi-Language Support**: Fully localized in English, Hindi, Chinese, French, Spanish, and German. Results are translated on-the-fly using AI.
+-   **📱 Cross-Platform**: Runs perfectly in the browser as a PWA or on Android/iOS via Capacitor.
+-   **🔊 Voice Insights**: Integrated Text-to-Speech (TTS) for hands-free analysis feedback.
+-   **📜 Scan History**: Save and revisit your previous scans and analyses locally on your device.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Tech Stack
 
-## Deploy on Vercel
+-   **Frontend**: [Next.js](https://nextjs.org/) (App Router), [React 19](https://react.dev/)
+-   **Styling**: [Tailwind CSS 4](https://tailwindcss.com/), [Framer Motion](https://www.framer.com/motion/) for animations.
+-   **AI Engine**: [Google Generative AI (Gemini 2.0 Flash)](https://ai.google.dev/)
+-   **Mobile/Native**: [Capacitor](https://capacitorjs.com/) for Android & iOS support.
+-   **PWA**: [Serwist](https://serwist.js.org/) for offline capabilities and service workers.
+-   **Icons**: [Lucide React](https://lucide.dev/)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🚀 Getting Started
 
+### Prerequisites
 
+-   Node.js 18+ and npm
+-   A Gemini API Key (Get one at [Google AI Studio](https://aistudio.google.com/))
 
+### Installation
 
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/coolshell2000/snapshop.git
+    cd snapshop
+    ```
+
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
+
+3.  **Run the development server**:
+    ```bash
+    npm run dev
+    ```
+    Open [http://localhost:3000](http://localhost:3000) to see the app.
+
+---
+
+## 📱 Mobile Build (Android)
+
+SnapShop is optimized for mobile devices. To build the Android APK:
+
+1.  Ensure you have the Android SDK and Java installed.
+2.  Run the automated build script:
+    ```bash
+    ./build-android.sh
+    ```
+    *Refer to [ANDROID_BUILD.md](./ANDROID_BUILD.md) for detailed prerequisites and manual build steps.*
+
+---
+
+## ⚙️ Configuration & Environment
+
+-   **API Key**: You can set your Gemini API Key directly in the app's **Settings** menu. It is stored securely in your browser's `localStorage`.
+-   **Amazon Affiliate**: Enter your Amazon Associate tag in settings to monetize links generated by the app.
+-   **Region**: The app automatically detects your region for accurate Amazon product pricing but can be overridden in settings.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! If you have a feature request or bug report, please open an issue or submit a pull request.
+
+---
+
+## ⚖️ Disclaimer
+
+-   **Skincare Advice**: The AI skin analysis is for informational/cosmetic purposes only. It is NOT medical advice. Always consult a dermatologist for skin conditions.
+-   **Affiliate Links**: This app may generate Amazon affiliate links. Purchases made through these links may earn the developer a commission.
+
+---
+
+Built with ❤️ by the SnapShop Team.
