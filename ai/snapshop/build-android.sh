@@ -112,6 +112,22 @@ print_success "APK built successfully: $APK_PATH"
 APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
 print_status "APK size: $APK_SIZE"
 
+# Copy APK to public folder for web download
+print_status "Copying APK to public folder for web download..."
+PROJECT_ROOT="../.."
+PUBLIC_APK_PATH="$PROJECT_ROOT/public/SnapShop.apk"
+cp "$APK_PATH" "$PUBLIC_APK_PATH"
+
+if [ $? -eq 0 ]; then
+    print_success "APK copied to public folder: $PUBLIC_APK_PATH"
+    # Get copied APK file size
+    COPIED_APK_SIZE=$(du -h "$PUBLIC_APK_PATH" | cut -f1)
+    print_status "Copied APK size: $COPIED_APK_SIZE"
+else
+    print_error "Failed to copy APK to public folder."
+    exit 1
+fi
+
 print_status "Installing APK on connected device..."
 adb install -r "$APK_PATH"
 

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LANGUAGES, Language, detectSystemLanguage } from "@/lib/translations";
+import ApkInfo from "@/components/ApkInfo";
 
 const REGIONS = [
     { code: "US", name: "United States (.com)", domain: "amazon.com", currency: "$" },
@@ -215,14 +216,17 @@ export default function SettingsPage() {
                     <h2 className="text-lg font-bold text-amber-500 mb-3">Download Mobile Apps</h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <a
-                            href="/SnapShop.apk"
-                            download="SnapShop.apk"
-                            className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                        >
-                            <Smartphone size={20} />
-                            Download for Android
-                        </a>
+                        <div className="flex flex-col items-center">
+                            <a
+                                href="/SnapShop.apk"
+                                download="SnapShop.apk"
+                                className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                            >
+                                <Smartphone size={20} />
+                                Download for Android
+                            </a>
+                            <ApkInfo />
+                        </div>
 
                         <div className="w-full bg-gradient-to-r from-gray-600 to-gray-800 text-white font-bold py-3 rounded-xl shadow-lg shadow-gray-700/20 opacity-70 flex items-center justify-center gap-2 cursor-not-allowed">
                             <Apple size={20} />

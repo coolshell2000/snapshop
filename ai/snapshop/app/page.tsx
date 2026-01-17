@@ -6,6 +6,7 @@ import { Settings, Sparkles, Scan, X, History as HistoryIcon, Languages, Downloa
 import Link from "next/link";
 import CameraCapture from "@/components/CameraCapture";
 import ProductCard from "@/components/ProductCard";
+import ApkInfo from "@/components/ApkInfo";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 type AppState = "idle" | "camera" | "analyzing" | "results";
@@ -393,23 +394,26 @@ export default function Home() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-900/20 via-black to-black -z-10" />
 
             {/* Mobile App Download Banner - positioned at bottom for non-interference */}
-            <div className="absolute bottom-4 right-4 z-50 flex gap-2">
-              <a
-                href="/SnapShop.apk"
-                download="SnapShop.apk"
-                className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-bold py-2 px-3 rounded-full shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all flex items-center gap-1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                <Smartphone size={14} />
-                <span>Android</span>
-              </a>
+            <div className="absolute bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+              <div className="flex gap-2">
+                <a
+                  href="/SnapShop.apk"
+                  download="SnapShop.apk"
+                  className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-bold py-2 px-3 rounded-full shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all flex items-center gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  <Smartphone size={14} />
+                  <span>Android</span>
+                </a>
 
-              <div className="bg-gradient-to-r from-gray-600 to-gray-800 text-white text-xs font-bold py-2 px-3 rounded-full shadow-lg shadow-gray-700/20 opacity-70 flex items-center gap-1 cursor-not-allowed">
-                <Apple size={14} />
-                <span>iOS</span>
+                <div className="bg-gradient-to-r from-gray-600 to-gray-800 text-white text-xs font-bold py-2 px-3 rounded-full shadow-lg shadow-gray-700/20 opacity-70 flex items-center gap-1 cursor-not-allowed">
+                  <Apple size={14} />
+                  <span>iOS</span>
+                </div>
               </div>
+              <ApkInfo />
             </div>
 
             {/* Tab Switcher */}
