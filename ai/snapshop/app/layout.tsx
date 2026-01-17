@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SnapShop",
-  description: "Snap a photo, find it on Amazon.",
+  title: "SnapBeautyShot - AI Skin Analysis",
+  description: "Advanced AI-powered skin analysis and recommendations.",
   manifest: "/manifest.json",
 };
 

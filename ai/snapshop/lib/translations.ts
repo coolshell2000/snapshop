@@ -12,20 +12,13 @@ export const LANGUAGES: Record<Language, { name: string; nativeName: string; fla
 export const translations: Record<Language, Record<string, string>> = {
     en: {
         // Header
-        'app.title': 'SnapShop',
-
-        // Tabs
-        'tab.shop': 'Shop',
-        'tab.skin': 'Skin Analysis',
+        'app.title': 'SnapBeautyShot',
 
         // Main Screen
-        'main.title.shop': 'Snap & Shop',
         'main.title.skin': 'Smart Skin Scan',
-        'main.subtitle.shop': 'Find any product on Amazon instantly.',
         'main.subtitle.skin': 'AI-powered skin analysis & recommendations.',
         'main.upload': 'Upload from Gallery',
         'main.upload.selfie': 'Upload Selfie',
-        'main.upload.image': 'Upload Image',
 
         // Analyzing
         'analyzing.title': 'The Eye is Seeing...',
@@ -61,7 +54,7 @@ export const translations: Record<Language, Record<string, string>> = {
         'history.backToList': 'Back to list',
     },
     hi: {
-        'app.title': 'स्नैपशॉप',
+        'app.title': 'SnapBeautyShot',
         'tab.shop': 'खरीदारी',
         'tab.skin': 'त्वचा विश्लेषण',
         'main.title.shop': 'स्नैप और खरीदें',
@@ -96,7 +89,7 @@ export const translations: Record<Language, Record<string, string>> = {
         'history.backToList': 'सूची पर वापस जाएं',
     },
     zh: {
-        'app.title': '快拍购物',
+        'app.title': 'SnapBeautyShot',
         'tab.shop': '购物',
         'tab.skin': '皮肤分析',
         'main.title.shop': '拍照购物',
@@ -131,7 +124,7 @@ export const translations: Record<Language, Record<string, string>> = {
         'history.backToList': '返回列表',
     },
     fr: {
-        'app.title': 'SnapShop',
+        'app.title': 'SnapBeautyShot',
         'tab.shop': 'Boutique',
         'tab.skin': 'Analyse de Peau',
         'main.title.shop': 'Photo & Achat',
@@ -166,7 +159,7 @@ export const translations: Record<Language, Record<string, string>> = {
         'history.backToList': 'Retour à la liste',
     },
     es: {
-        'app.title': 'SnapShop',
+        'app.title': 'SnapBeautyShot',
         'tab.shop': 'Comprar',
         'tab.skin': 'Análisis de Piel',
         'main.title.shop': 'Foto y Compra',
@@ -201,7 +194,7 @@ export const translations: Record<Language, Record<string, string>> = {
         'history.backToList': 'Volver a la lista',
     },
     de: {
-        'app.title': 'SnapShop',
+        'app.title': 'SnapBeautyShot',
         'tab.shop': 'Einkaufen',
         'tab.skin': 'Hautanalyse',
         'main.title.shop': 'Foto & Einkauf',

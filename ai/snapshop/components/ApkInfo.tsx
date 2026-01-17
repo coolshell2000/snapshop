@@ -6,7 +6,7 @@ interface ApkInfoProps {
   apkPath?: string;
 }
 
-export default function ApkInfo({ apkPath = '/SnapShop.apk' }: ApkInfoProps) {
+export default function ApkInfo({ apkPath = '/SnapBeautyShot.apk' }: ApkInfoProps) {
   const [apkInfo, setApkInfo] = useState<{ lastModified: string | null; username: string | null }>({
     lastModified: null,
     username: null,

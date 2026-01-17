@@ -1,6 +1,6 @@
-# 📸 SnapShop: AI-Powered Skin Analysis & Smart Shopping
+# ✨ SnapBeautyShot: AI-Powered Skin Analysis
 
-SnapShop is a modern, high-performance web and mobile application that leverages **Google's Gemini 2.0 Flash AI** to provide instant product recognition and deep skin analysis. Whether you're looking for the best price on a product you see or need personalized skincare advice, SnapShop is your AI companion.
+SnapBeautyShot is a modern, high-performance web and mobile application that leverages **Google's Gemini 2.0 Flash AI** to provide deep skin analysis and personalized skincare recommendations. Simply take a selfie to receive expert-level cosmetic insights.
 
 ![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
@@ -12,15 +12,13 @@ SnapShop is a modern, high-performance web and mobile application that leverages
 ## 📱 Project Preview
 
 <div align="center">
-  <img src="public/screenshots/snapshop_skin.png" width="30%" alt="SnapShop Skin Analysis" />
-  <img src="public/screenshots/snapshop_settings.png" width="30%" alt="SnapShop Settings" />
+  <img src="public/screenshots/snapshop_skin_dedicated.png" width="45%" alt="SnapBeautyShot Dedicated Skin Analysis" />
 </div>
 
 ---
 
 ## ✨ Key Features
 
--   **🛍️ Smart Shopping Mode**: Capture any product with your camera to identify it instantly. Get price estimates and direct links to Amazon with your affiliate tag integration.
 -   **✨ AI Skin Analysis**: Take a selfie to receive a comprehensive analysis of your skin type, concerns (e.g., oiliness, sensitivity), and undertones. Get personalized skincare routine recommendations.
 -   **🌍 Multi-Language Support**: Fully localized in English, Hindi, Chinese, French, Spanish, and German. Results are translated on-the-fly using AI.
 -   **📱 Cross-Platform**: Runs perfectly in the browser as a PWA or on Android/iOS via Capacitor.
@@ -70,7 +68,7 @@ SnapShop is a modern, high-performance web and mobile application that leverages
 
 ## 📱 Mobile Build (Android)
 
-SnapShop is optimized for mobile devices. To build the Android APK:
+SnapBeautyShot is optimized for mobile devices. To build the Android APK:
 
 1.  Ensure you have the Android SDK and Java installed.
 2.  Run the automated build script:
@@ -102,4 +100,4 @@ Contributions are welcome! If you have a feature request or bug report, please o
 
 ---
 
-Built with ❤️ by the SnapShop Team.
+Built with ❤️ by the SnapBeautyShot Team.
