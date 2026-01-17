@@ -48,11 +48,12 @@ export default function Home() {
   useEffect(() => {
     // 1. API Key Setup
     const key = localStorage.getItem("gemini_api_key");
+    const defaultKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (key) {
       setApiKey(key);
-    } else {
-      setApiKey("AIzaSyBNW_BnBJSPXSGlh-Gy9uah5xt5nFCNEiw");
-      localStorage.setItem("gemini_api_key", "AIzaSyBNW_BnBJSPXSGlh-Gy9uah5xt5nFCNEiw");
+    } else if (defaultKey) {
+      setApiKey(defaultKey);
+      localStorage.setItem("gemini_api_key", defaultKey);
     }
 
     // 2. Region Auto-Detect
@@ -133,7 +134,7 @@ export default function Home() {
   // Function to translate analysis results to the selected language
   const translateSkinResults = async (data: ProductResult, targetLang: string) => {
     try {
-      const storedKey = localStorage.getItem("gemini_api_key");
+      const storedKey = localStorage.getItem("gemini_api_key") || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
       if (!storedKey) {
         console.error("No Gemini API key found for translation");
         return data; // Return original data if no API key
@@ -235,7 +236,7 @@ export default function Home() {
       setImage(optimizedImage);
       setState("analyzing");
 
-      const storedKey = localStorage.getItem("gemini_api_key");
+      const storedKey = localStorage.getItem("gemini_api_key") || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
       const storedTag = localStorage.getItem("amazon_tag");
 
       if (!storedKey) {
@@ -275,11 +276,11 @@ export default function Home() {
             - asin: A likely ASIN (Amazon Standard Identification Number) for this specific product (e.g. "B08N5LLDSG"). Try your best to guess a valid one for the region.`;
       } else {
         prompt = `Respond in ${currentLang === 'en' ? 'English' :
-                   currentLang === 'hi' ? 'Hindi' :
-                   currentLang === 'zh' ? 'Chinese' :
-                   currentLang === 'fr' ? 'French' :
-                   currentLang === 'es' ? 'Spanish' :
-                   currentLang === 'de' ? 'German' : 'English'}.
+          currentLang === 'hi' ? 'Hindi' :
+            currentLang === 'zh' ? 'Chinese' :
+              currentLang === 'fr' ? 'French' :
+                currentLang === 'es' ? 'Spanish' :
+                  currentLang === 'de' ? 'German' : 'English'}.
 
         Analyze this selfie for skin condition and makeup tone.
         Focus on identifying skin type, concerns, and undertone. Recommend 3 relevant skincare or makeup products available on Amazon.
