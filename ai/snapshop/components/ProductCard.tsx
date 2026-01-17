@@ -59,15 +59,57 @@ const openExternalLink = async (url: string) => {
 };
 
 // Function to speak skin analysis details
-const speakSkinAnalysisDetails = (skinAnalysis: {
+const speakSkinAnalysisDetails = async (skinAnalysis: {
     skinType: string;
     concerns: string[];
     undertone: string;
     advice: string;
 }, currentLang: string, t: (key: string) => string) => {
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
+    // Construct the text to speak
+    const text = `${t('skin.skinType')}: ${skinAnalysis.skinType}. ${t('skin.undertone')}: ${skinAnalysis.undertone}. ${t('skin.concerns')}: ${skinAnalysis.concerns.join(', ')}. ${t('skin.advice')}: ${skinAnalysis.advice}`;
 
+    try {
+        // Check if we're in a browser environment
+        if (typeof window !== 'undefined') {
+            // Check if we're running in a Capacitor environment (Android/iOS)
+            if ((window as any).Capacitor) {
+                // Dynamically import the Capacitor Text-to-Speech plugin
+                const { TextToSpeech } = await import('@capacitor-community/text-to-speech');
+                // Use Capacitor Text-to-Speech plugin for mobile platforms
+                await TextToSpeech.speak({
+                    text: text,
+                    lang: getLanguageCode(currentLang),
+                    rate: 1.0,
+                    pitch: 1.0,
+                    volume: 1.0,
+                    category: 'ambient', // for Android
+                });
+            } else {
+                // Fallback to Web Speech API for web browsers
+                if ('speechSynthesis' in window) {
+                    // Cancel any ongoing speech
+                    window.speechSynthesis.cancel();
+
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = getLanguageCode(currentLang);
+                    utterance.rate = 1.0;
+                    utterance.pitch = 1.0;
+
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    console.warn('Text-to-speech not supported in this browser');
+                }
+            }
+        } else {
+            console.warn('Window object not available for text-to-speech');
+        }
+    } catch (error) {
+        console.error('Error with text-to-speech:', error);
+    }
+};
+
+// Helper function to map language codes
+const getLanguageCode = (currentLang: string): string => {
     const langMap: Record<string, string> = {
         'en': 'en-US',
         'hi': 'hi-IN',
@@ -77,15 +119,7 @@ const speakSkinAnalysisDetails = (skinAnalysis: {
         'de': 'de-DE',
     };
 
-    const utteranceLang = langMap[currentLang] || 'en-US';
-
-    // Construct the text to speak
-    const text = `${t('skin.skinType')}: ${skinAnalysis.skinType}. ${t('skin.undertone')}: ${skinAnalysis.undertone}. ${t('skin.concerns')}: ${skinAnalysis.concerns.join(', ')}. ${t('skin.advice')}: ${skinAnalysis.advice}`;
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = utteranceLang;
-
-    window.speechSynthesis.speak(utterance);
+    return langMap[currentLang] || 'en-US';
 };
 
 export default function ProductCard({ result, imageSrc, userTag = "bt200008-21", region = "US" }: ProductCardProps) {

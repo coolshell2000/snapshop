@@ -129,7 +129,7 @@ export default function Home() {
     });
   };
 
-  // Function to translate skin analysis results to the selected language
+  // Function to translate analysis results to the selected language
   const translateSkinResults = async (data: ProductResult, targetLang: string) => {
     try {
       const storedKey = localStorage.getItem("gemini_api_key");
@@ -141,31 +141,27 @@ export default function Home() {
       const genAI = new GoogleGenerativeAI(storedKey);
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-      // Prepare the content to translate
-      let contentToTranslate = "";
-
-      if (data.reason) {
-        contentToTranslate += `Reason: ${data.reason}\n`;
-      }
-
-      if (data.skinAnalysis) {
-        contentToTranslate += `Skin Type: ${data.skinAnalysis.skinType}\n`;
-        contentToTranslate += `Undertone: ${data.skinAnalysis.undertone}\n`;
-        contentToTranslate += `Concerns: ${data.skinAnalysis.concerns.join(', ')}\n`;
-        contentToTranslate += `Advice: ${data.skinAnalysis.advice}\n`;
-      }
-
-      if (data.similarProducts) {
-        for (const product of data.similarProducts) {
-          if (product.name) contentToTranslate += `Product Name: ${product.name}\n`;
-          if (product.type) contentToTranslate += `Product Type: ${product.type}\n`;
-          if (product.reason) contentToTranslate += `Reason: ${product.reason}\n`;
-        }
-      }
-
-      if (!contentToTranslate.trim()) {
-        return data; // Nothing to translate
-      }
+      // Prepare the content to translate in a structured way
+      const contentToTranslate = {
+        productName: data.productName,
+        searchQuery: data.searchQuery,
+        category: data.category,
+        priceEstimate: data.priceEstimate,
+        reason: data.reason,
+        confidence: data.confidence,
+        skinAnalysis: data.skinAnalysis ? {
+          skinType: data.skinAnalysis.skinType,
+          concerns: data.skinAnalysis.concerns,
+          undertone: data.skinAnalysis.undertone,
+          advice: data.skinAnalysis.advice
+        } : undefined,
+        similarProducts: data.similarProducts ? data.similarProducts.map(p => ({
+          name: p.name,
+          price: p.price,
+          type: p.type,
+          reason: p.reason
+        })) : undefined
+      };
 
       const languageMap: Record<string, string> = {
         'hi': 'Hindi',
@@ -178,61 +174,50 @@ export default function Home() {
       const targetLanguage = languageMap[targetLang] || 'English';
 
       const translationPrompt = `
-        Translate the following text to ${targetLanguage}.
-        Only return the translated text, nothing else.
+        Translate the following JSON object to ${targetLanguage}.
+        Only translate the text content, keep all other values (numbers, arrays, booleans) unchanged.
+        Only return the translated JSON object with the same structure, nothing else.
 
-        Text to translate:
-        ${contentToTranslate}
+        Input JSON:
+        ${JSON.stringify(contentToTranslate, null, 2)}
       `;
 
       const result = await model.generateContent(translationPrompt);
       const response = await result.response;
-      const translatedText = response.text();
+      let translatedText = response.text();
 
-      // Parse the translated text back into the structure
-      // This is a simplified parsing - in a real app, we'd want more robust parsing
-      const translatedData = { ...data };
+      // Clean up markdown code blocks if present
+      translatedText = translatedText.replace(/```json/g, "").replace(/```/g, "").trim();
 
-      // Update reason if it existed originally
-      if (data.reason) {
-        const reasonMatch = translatedText.match(/Reason:\s*(.*?)(?=\n|$)/i);
-        if (reasonMatch) {
-          translatedData.reason = reasonMatch[1].trim();
-        }
-      }
+      // Parse the translated JSON
+      const translatedContent = JSON.parse(translatedText);
 
-      // Update skin analysis if it exists
-      if (data.skinAnalysis) {
-        const skinTypeMatch = translatedText.match(/Skin Type:\s*(.*?)(?=\n|$)/i);
-        const undertoneMatch = translatedText.match(/Undertone:\s*(.*?)(?=\n|$)/i);
-        const concernsMatch = translatedText.match(/Concerns:\s*(.*?)(?=\n|$)/i);
-        const adviceMatch = translatedText.match(/Advice:\s*(.*?)(?=\n|$)/i);
-
-        if (skinTypeMatch) translatedData.skinAnalysis!.skinType = skinTypeMatch[1].trim();
-        if (undertoneMatch) translatedData.skinAnalysis!.undertone = undertoneMatch[1].trim();
-        if (concernsMatch) {
-          const concerns = concernsMatch[1].split(',').map(c => c.trim());
-          translatedData.skinAnalysis!.concerns = concerns;
-        }
-        if (adviceMatch) translatedData.skinAnalysis!.advice = adviceMatch[1].trim();
-      }
-
-      // Update similar products if they exist
-      if (data.similarProducts) {
-        const updatedProducts = [...data.similarProducts];
-
-        for (let i = 0; i < updatedProducts.length; i++) {
-          const product = updatedProducts[i];
-
-          // Look for product-specific translations in the response
-          if (product.name) {
-            // Simple approach: look for the original name and replace with translated version
-            // This is a simplified approach - a more robust solution would map each product individually
+      // Create the translated result object preserving non-translatable fields
+      const translatedData = {
+        ...data,
+        productName: translatedContent.productName || data.productName,
+        searchQuery: translatedContent.searchQuery || data.searchQuery,
+        category: translatedContent.category || data.category,
+        priceEstimate: translatedContent.priceEstimate || data.priceEstimate,
+        reason: translatedContent.reason || data.reason,
+        confidence: data.confidence, // Keep original confidence value
+        ...(data.skinAnalysis && {
+          skinAnalysis: {
+            skinType: translatedContent.skinAnalysis?.skinType || data.skinAnalysis.skinType,
+            concerns: translatedContent.skinAnalysis?.concerns || data.skinAnalysis.concerns,
+            undertone: translatedContent.skinAnalysis?.undertone || data.skinAnalysis.undertone,
+            advice: translatedContent.skinAnalysis?.advice || data.skinAnalysis.advice
           }
-        }
-
-        translatedData.similarProducts = updatedProducts;
-      }
+        }),
+        ...(data.similarProducts && {
+          similarProducts: data.similarProducts.map((originalProduct, index) => ({
+            ...originalProduct,
+            name: translatedContent.similarProducts?.[index]?.name || originalProduct.name,
+            type: translatedContent.similarProducts?.[index]?.type || originalProduct.type,
+            reason: translatedContent.similarProducts?.[index]?.reason || originalProduct.reason
+          }))
+        })
+      };
 
       return translatedData;
     } catch (error) {
@@ -343,9 +328,9 @@ export default function Home() {
       const data = JSON.parse(text);
       // ----------------------------------
 
-      // Translate results if not in English and mode is skin analysis
+      // Translate results if not in English for both shop and skin modes
       let translatedData = { ...data, userTag: storedTag };
-      if (mode === "skin" && currentLang !== 'en') {
+      if (currentLang !== 'en') {
         translatedData = await translateSkinResults(data, currentLang);
       }
 
