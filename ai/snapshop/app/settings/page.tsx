@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Save, Key, Tag } from "lucide-react";
+import { ArrowLeft, Save, Key, Tag, Languages, Download, Smartphone, Apple } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LANGUAGES, Language, detectSystemLanguage } from "@/lib/translations";
 
 const REGIONS = [
     { code: "US", name: "United States (.com)", domain: "amazon.com", currency: "$" },
@@ -19,6 +21,7 @@ const REGIONS = [
 
 export default function SettingsPage() {
     const router = useRouter();
+    const { primaryLang, secondaryLang, setPrimaryLang, setSecondaryLang, t } = useLanguage();
     const [apiKey, setApiKey] = useState("");
     const [amazonTag, setAmazonTag] = useState("");
     const [region, setRegion] = useState("US");
@@ -49,6 +52,23 @@ export default function SettingsPage() {
 
         setIsLoading(false);
     }, []);
+
+    // Initialize language settings with system language as default
+    useEffect(() => {
+        if (!isLoading) {
+            const detectedLang = detectSystemLanguage();
+            const storedPrimary = localStorage.getItem('primary_language') as Language;
+            const storedSecondary = localStorage.getItem('secondary_language') as Language | null;
+
+            if (!storedPrimary) {
+                setPrimaryLang(detectedLang);
+            }
+
+            if (storedSecondary) {
+                setSecondaryLang(storedSecondary);
+            }
+        }
+    }, [isLoading]);
 
     const handleSave = () => {
         try {
@@ -137,13 +157,83 @@ export default function SettingsPage() {
                     </p>
                 </div>
 
+                {/* Language Selection */}
+                <div className="space-y-4 pt-4 border-t border-white/10">
+                    <h2 className="text-lg font-bold text-amber-500">Language Settings</h2>
+
+                    <div className="space-y-2">
+                        <label className="text-sm text-gray-400 ml-1">Primary Language</label>
+                        <div className="relative">
+                            <Languages className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                            <select
+                                value={primaryLang}
+                                onChange={(e) => setPrimaryLang(e.target.value as Language)}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 pl-10 focus:outline-none focus:border-amber-500 transition-colors appearance-none text-white"
+                            >
+                                {Object.entries(LANGUAGES).map(([code, lang]) => (
+                                    <option key={code} value={code} className="bg-gray-900">
+                                        {lang.flag} {lang.nativeName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm text-gray-400 ml-1">Secondary Language (Optional)</label>
+                        <div className="relative">
+                            <Languages className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                            <select
+                                value={secondaryLang || ''}
+                                onChange={(e) => setSecondaryLang(e.target.value as Language || null)}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 pl-10 focus:outline-none focus:border-amber-500 transition-colors appearance-none text-white"
+                            >
+                                <option value="" className="bg-gray-900">None</option>
+                                {Object.entries(LANGUAGES).map(([code, lang]) => (
+                                    <option key={code} value={code} className="bg-gray-900">
+                                        {lang.flag} {lang.nativeName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <p className="text-xs text-gray-500 ml-1">
+                            Toggle between languages on the main screen
+                        </p>
+                    </div>
+                </div>
+
                 <button
                     onClick={handleSave}
                     className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-black font-bold py-4 rounded-xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-8"
                 >
                     <Save size={20} />
-                    Save Settings
+                    {t('settings.save')}
                 </button>
+
+                {/* Mobile Apps Download Section */}
+                <div className="mt-8 pt-6 border-t border-white/10">
+                    <h2 className="text-lg font-bold text-amber-500 mb-3">Download Mobile Apps</h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a
+                            href="/SnapShop.apk"
+                            download="SnapShop.apk"
+                            className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                        >
+                            <Smartphone size={20} />
+                            Download for Android
+                        </a>
+
+                        <div className="w-full bg-gradient-to-r from-gray-600 to-gray-800 text-white font-bold py-3 rounded-xl shadow-lg shadow-gray-700/20 opacity-70 flex items-center justify-center gap-2 cursor-not-allowed">
+                            <Apple size={20} />
+                            Coming Soon for iOS
+                        </div>
+                    </div>
+
+                    <p className="text-xs text-gray-500 mt-2 text-center">
+                        Install on your mobile device directly
+                    </p>
+                </div>
             </div>
         </div>
     );

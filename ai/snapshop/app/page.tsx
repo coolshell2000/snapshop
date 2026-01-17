@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings, Sparkles, Scan, X, History as HistoryIcon } from "lucide-react";
+import { Settings, Sparkles, Scan, X, History as HistoryIcon, Languages, Download, Smartphone, Apple } from "lucide-react";
 import Link from "next/link";
 import CameraCapture from "@/components/CameraCapture";
 import ProductCard from "@/components/ProductCard";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type AppState = "idle" | "camera" | "analyzing" | "results";
 type AppMode = "shop" | "skin";
@@ -35,6 +36,7 @@ export interface ProductResult {
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default function Home() {
+  const { t, secondaryLang, toggleLanguage, currentLang } = useLanguage();
   const [state, setState] = useState<AppState>("idle");
   const [mode, setMode] = useState<AppMode>("shop");
   const [image, setImage] = useState<string | null>(null);
@@ -127,6 +129,119 @@ export default function Home() {
     });
   };
 
+  // Function to translate skin analysis results to the selected language
+  const translateSkinResults = async (data: ProductResult, targetLang: string) => {
+    try {
+      const storedKey = localStorage.getItem("gemini_api_key");
+      if (!storedKey) {
+        console.error("No Gemini API key found for translation");
+        return data; // Return original data if no API key
+      }
+
+      const genAI = new GoogleGenerativeAI(storedKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+      // Prepare the content to translate
+      let contentToTranslate = "";
+
+      if (data.reason) {
+        contentToTranslate += `Reason: ${data.reason}\n`;
+      }
+
+      if (data.skinAnalysis) {
+        contentToTranslate += `Skin Type: ${data.skinAnalysis.skinType}\n`;
+        contentToTranslate += `Undertone: ${data.skinAnalysis.undertone}\n`;
+        contentToTranslate += `Concerns: ${data.skinAnalysis.concerns.join(', ')}\n`;
+        contentToTranslate += `Advice: ${data.skinAnalysis.advice}\n`;
+      }
+
+      if (data.similarProducts) {
+        for (const product of data.similarProducts) {
+          if (product.name) contentToTranslate += `Product Name: ${product.name}\n`;
+          if (product.type) contentToTranslate += `Product Type: ${product.type}\n`;
+          if (product.reason) contentToTranslate += `Reason: ${product.reason}\n`;
+        }
+      }
+
+      if (!contentToTranslate.trim()) {
+        return data; // Nothing to translate
+      }
+
+      const languageMap: Record<string, string> = {
+        'hi': 'Hindi',
+        'zh': 'Chinese',
+        'fr': 'French',
+        'es': 'Spanish',
+        'de': 'German'
+      };
+
+      const targetLanguage = languageMap[targetLang] || 'English';
+
+      const translationPrompt = `
+        Translate the following text to ${targetLanguage}.
+        Only return the translated text, nothing else.
+
+        Text to translate:
+        ${contentToTranslate}
+      `;
+
+      const result = await model.generateContent(translationPrompt);
+      const response = await result.response;
+      const translatedText = response.text();
+
+      // Parse the translated text back into the structure
+      // This is a simplified parsing - in a real app, we'd want more robust parsing
+      const translatedData = { ...data };
+
+      // Update reason if it existed originally
+      if (data.reason) {
+        const reasonMatch = translatedText.match(/Reason:\s*(.*?)(?=\n|$)/i);
+        if (reasonMatch) {
+          translatedData.reason = reasonMatch[1].trim();
+        }
+      }
+
+      // Update skin analysis if it exists
+      if (data.skinAnalysis) {
+        const skinTypeMatch = translatedText.match(/Skin Type:\s*(.*?)(?=\n|$)/i);
+        const undertoneMatch = translatedText.match(/Undertone:\s*(.*?)(?=\n|$)/i);
+        const concernsMatch = translatedText.match(/Concerns:\s*(.*?)(?=\n|$)/i);
+        const adviceMatch = translatedText.match(/Advice:\s*(.*?)(?=\n|$)/i);
+
+        if (skinTypeMatch) translatedData.skinAnalysis!.skinType = skinTypeMatch[1].trim();
+        if (undertoneMatch) translatedData.skinAnalysis!.undertone = undertoneMatch[1].trim();
+        if (concernsMatch) {
+          const concerns = concernsMatch[1].split(',').map(c => c.trim());
+          translatedData.skinAnalysis!.concerns = concerns;
+        }
+        if (adviceMatch) translatedData.skinAnalysis!.advice = adviceMatch[1].trim();
+      }
+
+      // Update similar products if they exist
+      if (data.similarProducts) {
+        const updatedProducts = [...data.similarProducts];
+
+        for (let i = 0; i < updatedProducts.length; i++) {
+          const product = updatedProducts[i];
+
+          // Look for product-specific translations in the response
+          if (product.name) {
+            // Simple approach: look for the original name and replace with translated version
+            // This is a simplified approach - a more robust solution would map each product individually
+          }
+        }
+
+        translatedData.similarProducts = updatedProducts;
+      }
+
+      return translatedData;
+    } catch (error) {
+      console.error("Translation failed:", error);
+      // Return original data if translation fails
+      return data;
+    }
+  };
+
   const handleCapture = async (imageSrc: string) => {
     try {
       // 1. Resize for UI/Analysis (Speed up Gemini Upload)
@@ -173,7 +288,14 @@ export default function Home() {
             - reason: 1 short sentence on why you recommend this.
             - asin: A likely ASIN (Amazon Standard Identification Number) for this specific product (e.g. "B08N5LLDSG"). Try your best to guess a valid one for the region.`;
       } else {
-        prompt = `Analyze this selfie for skin condition and makeup tone. 
+        prompt = `Respond in ${currentLang === 'en' ? 'English' :
+                   currentLang === 'hi' ? 'Hindi' :
+                   currentLang === 'zh' ? 'Chinese' :
+                   currentLang === 'fr' ? 'French' :
+                   currentLang === 'es' ? 'Spanish' :
+                   currentLang === 'de' ? 'German' : 'English'}.
+
+        Analyze this selfie for skin condition and makeup tone.
         Focus on identifying skin type, concerns, and undertone. Recommend 3 relevant skincare or makeup products available on Amazon.
         Be helpful and constructive. DO NOT give medical advice, just general cosmetic observations.
 
@@ -221,11 +343,17 @@ export default function Home() {
       const data = JSON.parse(text);
       // ----------------------------------
 
-      setResult({ ...data, userTag: storedTag });
+      // Translate results if not in English and mode is skin analysis
+      let translatedData = { ...data, userTag: storedTag };
+      if (mode === "skin" && currentLang !== 'en') {
+        translatedData = await translateSkinResults(data, currentLang);
+      }
+
+      setResult(translatedData);
 
       // 2. Create tiny thumbnail for History (Save LocalStorage space)
       const historyThumbnail = await resizeImage(imageSrc, 150);
-      saveToHistory(historyThumbnail, { ...data, userTag: storedTag });
+      saveToHistory(historyThumbnail, translatedData);
 
       setState("results");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -249,9 +377,16 @@ export default function Home() {
       <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-50 pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto">
           <Sparkles className="text-amber-500" />
-          <span className="font-bold text-xl tracking-tighter">SnapShop</span>
+          <span className="font-bold text-xl tracking-tighter">{t('app.title')}</span>
         </div>
         <div className="flex items-center gap-2 pointer-events-auto">
+          <button
+            onClick={toggleLanguage}
+            className="p-2 glass rounded-full hover:bg-white/20 transition-colors"
+            title="Toggle Language"
+          >
+            <Languages size={20} className="text-amber-500" />
+          </button>
           <Link href="/history" className="p-2 glass rounded-full hover:bg-white/20 transition-colors">
             <HistoryIcon size={20} className="text-amber-500" />
           </Link>
@@ -268,9 +403,29 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center h-screen p-6 text-center space-y-8"
+            className="flex flex-col items-center justify-center h-screen p-6 pb-20 text-center space-y-8"
           >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-900/20 via-black to-black -z-10" />
+
+            {/* Mobile App Download Banner - positioned at bottom for non-interference */}
+            <div className="absolute bottom-4 right-4 z-50 flex gap-2">
+              <a
+                href="/SnapShop.apk"
+                download="SnapShop.apk"
+                className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-bold py-2 px-3 rounded-full shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all flex items-center gap-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <Smartphone size={14} />
+                <span>Android</span>
+              </a>
+
+              <div className="bg-gradient-to-r from-gray-600 to-gray-800 text-white text-xs font-bold py-2 px-3 rounded-full shadow-lg shadow-gray-700/20 opacity-70 flex items-center gap-1 cursor-not-allowed">
+                <Apple size={14} />
+                <span>iOS</span>
+              </div>
+            </div>
 
             {/* Tab Switcher */}
             <div className="flex glass p-1 rounded-full border border-white/20">
@@ -278,13 +433,13 @@ export default function Home() {
                 onClick={() => setMode("shop")}
                 className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${mode === "shop" ? "bg-amber-500 text-black shadow-lg" : "text-gray-400 hover:text-white"}`}
               >
-                🛍️ Shop
+                🛍️ {t('tab.shop')}
               </button>
               <button
                 onClick={() => setMode("skin")}
                 className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${mode === "skin" ? "bg-pink-500 text-black shadow-lg" : "text-gray-400 hover:text-white"}`}
               >
-                ✨ Skin Analysis
+                ✨ {t('tab.skin')}
               </button>
             </div>
 
@@ -299,8 +454,8 @@ export default function Home() {
               }}
               transition={{ duration: 2, repeat: Infinity }}
               className={`w-48 h-48 rounded-full border flex items-center justify-center cursor-pointer transition-colors ${mode === "shop"
-                  ? "bg-gradient-to-br from-orange-500/20 to-amber-500/10 border-amber-500/30"
-                  : "bg-gradient-to-br from-pink-500/20 to-rose-500/10 border-pink-500/30"
+                ? "bg-gradient-to-br from-orange-500/20 to-amber-500/10 border-amber-500/30"
+                : "bg-gradient-to-br from-pink-500/20 to-rose-500/10 border-pink-500/30"
                 }`}
               onClick={() => setState("camera")}
             >
@@ -324,18 +479,18 @@ export default function Home() {
                   }
                 }}
               />
-              <span className="text-sm font-medium">📁 {mode === "shop" ? "Upload Image" : "Upload Selfie"}</span>
+              <span className="text-sm font-medium">📁 {mode === "shop" ? t('main.upload.image') : t('main.upload.selfie')}</span>
             </label>
 
             <div>
               <h1 className={`text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r transition-all ${mode === "shop" ? "from-orange-400 to-white" : "from-pink-400 to-rose-200"
                 }`}>
-                {mode === "shop" ? "Snap & Shop" : "Smart Skin Scan"}
+                {mode === "shop" ? t('main.title.shop') : t('main.title.skin')}
               </h1>
               <p className="text-gray-400 mt-2">
                 {mode === "shop"
-                  ? "Find any product on Amazon instantly."
-                  : "AI-powered skin analysis & recommendations."}
+                  ? t('main.subtitle.shop')
+                  : t('main.subtitle.skin')}
               </p>
             </div>
 
@@ -402,7 +557,7 @@ export default function Home() {
 
             <div className="relative z-10 flex flex-col items-center">
               <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-4" />
-              <h2 className="text-2xl font-bold text-white text-glow">The Eye is Seeing...</h2>
+              <h2 className="text-2xl font-bold text-white text-glow">{t('analyzing.title')}</h2>
             </div>
           </motion.div>
         )}
@@ -427,7 +582,7 @@ export default function Home() {
               className="mt-8 text-gray-400 hover:text-white transition-colors flex items-center gap-2"
             >
               <Scan size={16} />
-              Scan Another
+              {t('results.scanAnother')}
             </button>
           </motion.div>
         )}

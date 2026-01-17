@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShoppingCart, ExternalLink } from "lucide-react";
+import { ShoppingCart, ExternalLink, Volume2 } from "lucide-react";
 import { Browser } from '@capacitor/browser';
+import { useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ProductCardProps {
     result: {
@@ -46,17 +48,50 @@ const REGION_DOMAINS: Record<string, string> = {
 
 const openExternalLink = async (url: string) => {
     try {
-        // Try to open in external browser (Capacitor)
-        await Browser.open({ url });
+        // For Amazon Associate compliance, we need to open the URL in the default browser
+        // which will automatically redirect to the Amazon app if installed
+        // This ensures the associate tag is properly tracked
+        window.open(url, '_system');
     } catch (error) {
         // Fallback for web (non-Capacitor environment)
         window.open(url, '_blank', 'noopener,noreferrer');
     }
 };
 
+// Function to speak skin analysis details
+const speakSkinAnalysisDetails = (skinAnalysis: {
+    skinType: string;
+    concerns: string[];
+    undertone: string;
+    advice: string;
+}, currentLang: string, t: (key: string) => string) => {
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const langMap: Record<string, string> = {
+        'en': 'en-US',
+        'hi': 'hi-IN',
+        'zh': 'zh-CN',
+        'fr': 'fr-FR',
+        'es': 'es-ES',
+        'de': 'de-DE',
+    };
+
+    const utteranceLang = langMap[currentLang] || 'en-US';
+
+    // Construct the text to speak
+    const text = `${t('skin.skinType')}: ${skinAnalysis.skinType}. ${t('skin.undertone')}: ${skinAnalysis.undertone}. ${t('skin.concerns')}: ${skinAnalysis.concerns.join(', ')}. ${t('skin.advice')}: ${skinAnalysis.advice}`;
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = utteranceLang;
+
+    window.speechSynthesis.speak(utterance);
+};
+
 export default function ProductCard({ result, imageSrc, userTag = "bt200008-21", region = "US" }: ProductCardProps) {
     const domain = REGION_DOMAINS[region] || "amazon.com";
     const amazonUrl = `https://www.${domain}/s?k=${encodeURIComponent(result.searchQuery)}&tag=${userTag}`;
+    const { t, currentLang } = useLanguage();
 
     return (
         <div className="w-full max-w-sm space-y-4">
@@ -98,24 +133,33 @@ export default function ProductCard({ result, imageSrc, userTag = "bt200008-21",
 
                     {result.skinAnalysis && (
                         <div className="space-y-4 animate-in fade-in duration-500">
-                            <div className="flex items-center gap-2 text-amber-500">
-                                <BrainCircuit size={18} />
-                                <span className="font-bold text-sm uppercase tracking-wider">AI Insights</span>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 text-amber-500">
+                                    <BrainCircuit size={18} />
+                                    <span className="font-bold text-sm uppercase tracking-wider">{t('skin.insights')}</span>
+                                </div>
+                                <button
+                                    onClick={() => result.skinAnalysis && speakSkinAnalysisDetails(result.skinAnalysis, currentLang, t)}
+                                    className="p-2 rounded-full transition-colors bg-white/5 text-amber-500 hover:bg-white/10"
+                                    title={t('skin.readAloud')}
+                                >
+                                    <Volume2 size={16} />
+                                </button>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                                    <div className="text-[10px] text-gray-500 uppercase font-bold mb-1">Skin Type</div>
+                                    <div className="text-[10px] text-gray-500 uppercase font-bold mb-1">{t('skin.skinType')}</div>
                                     <div className="text-sm text-white font-medium">{result.skinAnalysis.skinType}</div>
                                 </div>
                                 <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                                    <div className="text-[10px] text-gray-500 uppercase font-bold mb-1">Undertone</div>
+                                    <div className="text-[10px] text-gray-500 uppercase font-bold mb-1">{t('skin.undertone')}</div>
                                     <div className="text-sm text-white font-medium">{result.skinAnalysis.undertone}</div>
                                 </div>
                             </div>
 
                             <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                                <div className="text-[10px] text-gray-500 uppercase font-bold mb-2">Concerns</div>
+                                <div className="text-[10px] text-gray-500 uppercase font-bold mb-2">{t('skin.concerns')}</div>
                                 <div className="flex flex-wrap gap-2">
                                     {result.skinAnalysis.concerns.map((concern, i) => (
                                         <span key={i} className="text-[10px] bg-amber-500/10 text-amber-500 px-2 py-1 rounded-full border border-amber-500/20">
@@ -128,7 +172,7 @@ export default function ProductCard({ result, imageSrc, userTag = "bt200008-21",
                             <div className="bg-amber-500/10 p-4 rounded-xl border border-amber-500/20">
                                 <div className="flex items-center gap-2 text-amber-500 mb-2">
                                     <Droplets size={16} />
-                                    <span className="text-xs font-bold uppercase">Expert Advice</span>
+                                    <span className="text-xs font-bold uppercase">{t('skin.advice')}</span>
                                 </div>
                                 <p className="text-xs text-gray-300 leading-relaxed">
                                     {result.skinAnalysis.advice}
@@ -142,7 +186,7 @@ export default function ProductCard({ result, imageSrc, userTag = "bt200008-21",
                         className="w-full bg-[#FF9900] text-black font-bold py-4 rounded-xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group"
                     >
                         <ShoppingCart size={20} className="group-hover:rotate-12 transition-transform" />
-                        {result.skinAnalysis ? "Browse Skin Solutions" : `Shop on Amazon ${region !== "US" ? `(${region})` : ""}`}
+                        {result.skinAnalysis ? t('results.browseSkin') : t('results.shopAmazon')}
                     </button>
                 </div>
             </motion.div>
@@ -156,7 +200,7 @@ export default function ProductCard({ result, imageSrc, userTag = "bt200008-21",
                     className="w-full"
                 >
                     <div className="flex items-center gap-2 mb-2 px-2">
-                        <span className="text-sm font-bold text-gray-300">You might also like</span>
+                        <span className="text-sm font-bold text-gray-300">{t('results.similarProducts')}</span>
                     </div>
                     <div className="space-y-4">
                         {result.similarProducts.map((item, idx) => {
