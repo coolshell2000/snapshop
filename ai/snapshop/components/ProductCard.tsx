@@ -1,33 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShoppingCart, ExternalLink, Volume2 } from "lucide-react";
+import { ShoppingCart, ExternalLink, Volume2, Share2 } from "lucide-react";
 import { Browser } from '@capacitor/browser';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import ShareModal from './ShareModal';
+
+import type { ProductResult } from '@/app/page';
 
 interface ProductCardProps {
-    result: {
-        productName: string;
-        searchQuery: string;
-        category: string;
-        priceEstimate: string;
-        confidence: number;
-        reason?: string;
-        skinAnalysis?: {
-            skinType: string;
-            concerns: string[];
-            undertone: string;
-            advice: string;
-        };
-        similarProducts?: {
-            name: string;
-            price: string;
-            type: string;
-            reason?: string;
-            asin?: string;
-        }[];
-    };
+    result: ProductResult;
     imageSrc: string;
     userTag?: string;
     region?: string;
@@ -126,6 +109,7 @@ export default function ProductCard({ result, imageSrc, userTag = "bt200008-21",
     const domain = REGION_DOMAINS[region] || "amazon.com";
     const amazonUrl = `https://www.${domain}/s?k=${encodeURIComponent(result.searchQuery)}&tag=${userTag}`;
     const { t, currentLang } = useLanguage();
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
     return (
         <div className="w-full max-w-sm space-y-4">
@@ -172,13 +156,22 @@ export default function ProductCard({ result, imageSrc, userTag = "bt200008-21",
                                     <BrainCircuit size={18} />
                                     <span className="font-bold text-sm uppercase tracking-wider">{t('skin.insights')}</span>
                                 </div>
-                                <button
-                                    onClick={() => result.skinAnalysis && speakSkinAnalysisDetails(result.skinAnalysis, currentLang, t)}
-                                    className="p-2 rounded-full transition-colors bg-white/5 text-amber-500 hover:bg-white/10"
-                                    title={t('skin.readAloud')}
-                                >
-                                    <Volume2 size={16} />
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setIsShareModalOpen(true)}
+                                        className="p-2 rounded-full transition-colors bg-white/5 text-blue-500 hover:bg-white/10"
+                                        title={t('share.title')}
+                                    >
+                                        <Share2 size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => result.skinAnalysis && speakSkinAnalysisDetails(result.skinAnalysis, currentLang, t)}
+                                        className="p-2 rounded-full transition-colors bg-white/5 text-amber-500 hover:bg-white/10"
+                                        title={t('skin.readAloud')}
+                                    >
+                                        <Volume2 size={16} />
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
@@ -284,6 +277,14 @@ export default function ProductCard({ result, imageSrc, userTag = "bt200008-21",
                     </div>
                 </motion.div>
             )}
+
+            {/* Share Modal */}
+            <ShareModal
+                isOpen={isShareModalOpen}
+                onClose={() => setIsShareModalOpen(false)}
+                result={result}
+                imageSrc={imageSrc}
+            />
         </div>
     );
 }
