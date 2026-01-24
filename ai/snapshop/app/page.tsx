@@ -341,10 +341,17 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       {/* Header */}
-      <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-50 pointer-events-none">
+      <div className="absolute top-0 left-0 w-full p-4 pt-[calc(1rem+env(safe-area-inset-top))] flex justify-between items-center z-50 pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto">
-          <Sparkles className="text-amber-500" />
-          <span className="font-bold text-xl tracking-tighter">{t('app.title')}</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/taotaoapp_dragon.jpg"
+            alt="SnapBeautyShot"
+            className="w-8 h-8 rounded-full border border-amber-500/50"
+          />
+          <span className="font-bold text-xl tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-amber-200 to-amber-500">
+            {t('app.title')}
+          </span>
         </div>
         <div className="flex items-center gap-2 pointer-events-auto">
           <button

@@ -11,6 +11,8 @@
 - [x] 1.9 Add "Copy to Clipboard" functionality
 - [x] 1.10 Add privacy controls (checkboxes for what to include)
 - [x] 1.11 Update translations for share UI text
+- [x] 1.12 Update branding to `taotaoapp_dragon.jpg` (Header, Share Watermark, Manifests)
+- [x] 1.13 Implement Safe Area padding for Android/iOS Status Bar fix
 
 ## 2. Testing
 

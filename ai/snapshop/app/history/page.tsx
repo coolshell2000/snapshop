@@ -50,7 +50,7 @@ export default function HistoryPage() {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white p-4">
+        <div className="min-h-screen bg-black text-white p-4 pt-[calc(1rem+env(safe-area-inset-top))]">
             {/* Header */}
             <div className="flex items-center justify-between mb-8 pt-2">
                 <Link href="/" className="p-2 glass rounded-full hover:bg-white/20 transition-colors">

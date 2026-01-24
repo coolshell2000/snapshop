@@ -4,14 +4,9 @@
   "description": "Snap a photo, shop on Amazon.",
   "icons": [
     {
-      "src": "/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/taotaoapp_dragon.jpg",
+      "sizes": "any",
+      "type": "image/jpeg"
     }
   ],
   "theme_color": "#000000",
