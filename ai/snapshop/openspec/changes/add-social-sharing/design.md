@@ -130,13 +130,35 @@ If issues arise, simply hide the share button via feature flag or remove the com
    - Requires specific image dimensions and formats
    - May need additional UI/UX design
    - Defer to post-MVP based on user demand
-
-2. **Should shared images include affiliate links or QR codes?**
+3. **Should shared images include affiliate links or QR codes?**
    - Could drive traffic back to app
    - May clutter the design
    - Defer to post-MVP
 
-3. **Should we track share analytics (client-side)?**
+4. **Should we track share analytics (client-side)?**
    - Could inform feature improvements
    - Adds complexity
    - Defer to post-MVP, maintain privacy-first approach
+
+## Recent Updates
+
+### Brand Identity
+Updated the application branding to use `taotaoapp_dragon.jpg` (a custom brand asset) instead of the generic Sparkles icon. This improves brand recognition and gives the app a more polished feel. The brand image is:
+- Displayed in the main header
+- Included as a watermark in generated share images
+- Used as the app icon in the PWA manifest
+- Used as the app icon in the Android app manifest
+- Used as the app icon in the iOS app manifest
+
+### Affiliate Link Optimization
+Improved Amazon Affiliate link handling to ensure robust tracking on mobile devices.
+- **Problem**: Previous implementation used `window.open(url, '_system')` which was inconsistent across devices and sometimes failed to trigger the Amazon App (deep linking).
+- **Solution**: Refactored `ProductCard` to use `@capacitor/browser`.
+  - **Native (Android/iOS)**: Uses `Browser.open({ url })` which launches Chrome Custom Tabs / SFSafariViewController. This shares cookies with the system browser and correctly handles deep links to the Amazon App.
+  - **Web**: Falls back to `window.open(url, '_blank')`.
+
+### Status Bar / Safe Area Fix
+Resolved an issue where the app header overlapped with the transparent system status bar on Android ("edge-to-edge" display).
+- **Fix**: Added `viewport-fit=cover` to `app/layout.tsx` and applied `padding-top: env(safe-area-inset-top)` to page headers.
+- **Result**: Content now respects the system safe areas while maintaining the immersive full-screen design.
+

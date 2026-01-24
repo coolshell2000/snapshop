@@ -102,10 +102,36 @@ export async function generateShareImage(
     }
 
     // Add branding/logo
+    // Add branding/logo
     if (options.includeBranding) {
-        ctx.fillStyle = '#f59e0b';
-        ctx.font = 'bold 48px system-ui';
-        ctx.fillText('✨ SnapBeautyShot', 40, 80);
+        try {
+            const logo = new Image();
+            logo.crossOrigin = 'anonymous';
+            await new Promise((resolve, reject) => {
+                logo.onload = resolve;
+                logo.onerror = reject;
+                logo.src = '/taotaoapp_dragon.jpg';
+            });
+
+            // Draw logo
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(60, 60, 30, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(logo, 30, 30, 60, 60);
+            ctx.restore();
+
+            // Draw text next to logo
+            ctx.fillStyle = '#f59e0b';
+            ctx.font = 'bold 48px system-ui';
+            ctx.fillText('SnapBeautyShot', 110, 80);
+        } catch (e) {
+            // Fallback to text only
+            ctx.fillStyle = '#f59e0b';
+            ctx.font = 'bold 48px system-ui';
+            ctx.fillText('✨ SnapBeautyShot', 40, 80);
+        }
     }
 
     let yOffset = options.includeBranding ? 160 : 60;

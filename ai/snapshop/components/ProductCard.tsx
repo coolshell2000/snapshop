@@ -29,14 +29,21 @@ const REGION_DOMAINS: Record<string, string> = {
     "IN": "amazon.in",
 };
 
+import { Capacitor } from '@capacitor/core';
+
 const openExternalLink = async (url: string) => {
     try {
-        // For Amazon Associate compliance, we need to open the URL in the default browser
-        // which will automatically redirect to the Amazon app if installed
-        // This ensures the associate tag is properly tracked
-        window.open(url, '_system');
+        if (Capacitor.isNativePlatform()) {
+            // Use Capacitor Browser for mobile apps to ensure correct behavior (Chrome Custom Tabs / SFSafariViewController)
+            // This is crucial for Amazon Affiliate tracking working correctly
+            await Browser.open({ url });
+        } else {
+            // Standard web behavior: open in new tab
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
     } catch (error) {
-        // Fallback for web (non-Capacitor environment)
+        console.error("Failed to open URL:", error);
+        // Fallback just in case
         window.open(url, '_blank', 'noopener,noreferrer');
     }
 };

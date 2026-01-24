@@ -12,7 +12,7 @@ SnapBeautyShot is a modern, high-performance web and mobile application that lev
 ## 📱 Project Preview
 
 <div align="center">
-  <img src="public/screenshots/snapshop_skin_dedicated.png" width="45%" alt="SnapBeautyShot Dedicated Skin Analysis" />
+  <img src="public/screenshots/snapshop_skin_dedicated.png" width="45%" alt="SnapBeautyShot Dedicated Skin Aopnalysis" />
 </div>
 
 ---
@@ -64,6 +64,18 @@ SnapBeautyShot is a modern, high-performance web and mobile application that lev
     ```
     Open [http://localhost:3000](http://localhost:3000) to see the app.
 
+4.  **Run with Streamlit** (Optional - for AI/Python Demo platforms):
+    ```bash
+    # Build static export first
+    npm run build
+    
+    # Install python deps
+    pip install -r requirements.txt
+    
+    # Run streamlit
+    streamlit run streamlit_app.py
+    ```
+
 ---
 
 ## 📱 Mobile Build (Android)
@@ -101,3 +113,4 @@ Contributions are welcome! If you have a feature request or bug report, please o
 ---
 
 Built with ❤️ by the SnapBeautyShot Team.
+Review

@@ -87,7 +87,7 @@ export default function SettingsPage() {
     if (isLoading) return <div className="min-h-screen bg-black text-white p-6">Loading...</div>;
 
     return (
-        <div className="min-h-screen bg-black text-white p-6 relative overflow-hidden">
+        <div className="min-h-screen bg-black text-white p-6 pt-[calc(1.5rem+env(safe-area-inset-top))] relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-amber-900/20 via-black to-black -z-10" />
 
             <div className="flex items-center gap-4 mb-8">
